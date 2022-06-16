@@ -159,5 +159,42 @@ public class App {
                 .collect(Collectors.toList());
     }
 
+    // Java8 부터
+    static Future<Double> getFuturePriceInUSDWithCompletableFuture(Shop shop, String product, Executor executor) {
+        return CompletableFuture.supplyAsync(() -> shop.getPrice(product), executor)
+                .thenCombine(
+                        CompletableFuture.supplyAsync(() -> ExchangeService.getRate(Money.EUR, Money.USD)),
+                        (price, rate) -> price * rate
+                );
+    }
 
+    // Java8 이전
+    static Future<Double> getFuturePriceInUSDWithFuture(Shop shop, String product, ExecutorService executor) {
+        Future<Double> futureRate = executor.submit(new Callable<Double>() {
+            @Override
+            public Double call() throws Exception {
+                return ExchangeService.getRate(Money.EUR, Money.USD);
+            }
+        });
+
+        return executor.submit(new Callable<Double>() {
+            @Override
+            public Double call() throws Exception {
+                double priceInEUR = shop.getPrice(product);
+                return priceInEUR * futureRate.get();
+            }
+        });
+    }
+
+    // Java9부터 timeout 관련 메소드 지원
+    static Future<Double> getFuturePriceInUSDWithCompletableFutureWithTimeout(Shop shop, String product, Executor executor) {
+        return CompletableFuture.supplyAsync(() -> shop.getPrice(product), executor)
+                .thenCombine(
+                        CompletableFuture.supplyAsync(() -> ExchangeService.getRate(Money.EUR, Money.USD))
+                                .completeOnTimeout(1.0, 1, TimeUnit.SECONDS)
+                        ,
+                        (price, rate) -> price * rate
+                )
+                .orTimeout(3, TimeUnit.SECONDS);
+    }
 }
