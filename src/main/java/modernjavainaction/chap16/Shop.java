@@ -4,7 +4,7 @@ import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
-import static modernjavainaction.chap16.Util.delay;
+import static modernjavainaction.chap16.Delay.delay;
 
 public class Shop {
     private Random random = new Random();

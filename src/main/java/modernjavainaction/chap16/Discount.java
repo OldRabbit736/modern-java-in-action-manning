@@ -1,6 +1,6 @@
 package modernjavainaction.chap16;
 
-import static modernjavainaction.chap16.Util.delay;
+import static modernjavainaction.chap16.Delay.delay;
 
 public class Discount {
     public enum Code {
