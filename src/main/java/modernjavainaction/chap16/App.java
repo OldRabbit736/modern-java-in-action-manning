@@ -38,7 +38,9 @@ public class App {
 //        measureFindPrices(App::findPricesAsyncUsingCustomExecutor);
 //        measureFindPrices(App::findPricesWithDiscount);
 //        measureFindPrices(App::findPricesWithDiscountAsyncMyTry);
-        measureFindPrices(App::findPricesWithDiscountAsync);
+//        measureFindPrices(App::findPricesWithDiscountAsync);
+
+        printPrices(shops, "myPhone");
     }
 
     static void getPrice() {
@@ -196,5 +198,37 @@ public class App {
                         (price, rate) -> price * rate
                 )
                 .orTimeout(3, TimeUnit.SECONDS);
+    }
+
+    public static Stream<CompletableFuture<String>> findPricesStream(List<Shop> shops, String product) {
+        return shops.stream()
+                .map(shop -> CompletableFuture.supplyAsync(
+                        () -> shop.getPriceWithCouponCodeAndRandomDelay(product), executor
+                ))
+                .map(future -> future.thenApply(Quote::parse))
+                .map(future -> future.thenCompose(quote ->
+                        CompletableFuture.supplyAsync(
+                                () -> Discount.applyDiscount(quote), executor
+                        )
+                ));
+    }
+
+    public static void printPrices(List<Shop> shops, String product) {
+        long start = System.nanoTime();
+
+        CompletableFuture[] futures = findPricesStream(shops, product)
+                .map(future -> future.thenAccept(
+                        s -> System.out.println(
+                                s + " (done in " + ((System.nanoTime() - start) / 1_000_000) + " msecs)")
+                ))
+                .toArray(CompletableFuture[]::new);
+
+        CompletableFuture.allOf(futures).join();
+
+        System.out.println(
+                "All shops have now responded in "
+                + ((System.nanoTime() - start) / 1_000_000)
+                + " msecs"
+        );
     }
 }
