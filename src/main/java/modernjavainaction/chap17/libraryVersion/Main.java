@@ -1,4 +1,4 @@
-package modernjavainaction.chap17.library;
+package modernjavainaction.chap17.libraryVersion;
 
 
 import io.reactivex.rxjava3.core.Observable;

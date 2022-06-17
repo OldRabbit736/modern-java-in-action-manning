@@ -1,4 +1,4 @@
-package modernjavainaction.chap17.implemet;
+package modernjavainaction.chap17.implementVersion;
 
 public class Main {
 
