@@ -1,4 +1,4 @@
-package modernjavainaction.chap17;
+package modernjavainaction.chap17.implemet;
 
 import java.util.Random;
 

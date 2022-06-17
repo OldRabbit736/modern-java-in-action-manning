@@ -24,7 +24,13 @@
             <artifactId>jmh-generator-annprocess</artifactId>
             <version>1.35</version>
         </dependency>
+        <dependency>
+            <groupId>io.reactivex.rxjava3</groupId>
+            <artifactId>rxjava</artifactId>
+            <version>3.1.5</version>
+        </dependency>
     </dependencies>
+
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
